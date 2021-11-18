@@ -31,13 +31,16 @@ func BubbleSortOpt1(arr []int) {
 // BubbleSortOpt2 冒泡排序第二版优化
 func BubbleSortOpt2(arr []int) {
 	end := len(arr) - 1
-	
-	for end > 0 {
-		swapIndex := 0
+	sorted := false
+	swapIndex := 0
+
+	for !sorted && end > 0 {
+		sorted = true
 		for i := 0; i < end; i++ {
 			if arr[i] > arr[i+1] {
 				arr[i], arr[i+1] = arr[i+1], arr[i]
 				swapIndex = i
+				sorted = false
 			}
 		}
 		end = swapIndex

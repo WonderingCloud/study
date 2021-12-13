@@ -1,4 +1,4 @@
-package sort
+package mysort
 
 // BubbleSort 冒泡排序
 func BubbleSort(arr []int) {
@@ -44,5 +44,25 @@ func BubbleSortOpt2(arr []int) {
 			}
 		}
 		end = swapIndex
+	}
+}
+
+// SelectionSort 选择排序
+func SelectionSort(arr []int) {
+	for i := 0; i < len(arr); i++ {
+		minIndex := i
+		for j := i + 1; j < len(arr); j++ {
+			if arr[j] < arr[minIndex] {
+				minIndex = j
+			}
+		}
+		arr[i], arr[minIndex] = arr[minIndex], arr[i]
+	}
+}
+
+// InsertionSort 插入排序
+func InsertionSort(arr []int) {
+	for i := 0; i < len(arr); i++ {
+
 	}
 }

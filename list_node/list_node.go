@@ -121,4 +121,86 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	return dummy.Next
 }
 
+func swapPairs(head *ListNode) *ListNode {
+	dummy := &ListNode{0, head}
+	cur := dummy
+	for cur.Next != nil && cur.Next.Next != nil {
+		temp := cur.Next.Next
+		cur.Next.Next = temp.Next
+		temp.Next = cur.Next
+		cur.Next = temp
 
+		cur = cur.Next.Next
+	}
+
+	return dummy.Next
+}
+
+func rotateRight(head *ListNode, k int) *ListNode {
+	l := 0
+	cur := head
+	for cur != nil {
+		l++
+		cur = cur.Next
+	}
+
+	if l == 0 || k%l == 0 {
+		return head
+	}
+
+	second, first := head, head
+	for i := 0; i < k%l; i++ {
+		first = first.Next
+	}
+	for first.Next != nil {
+		second = second.Next
+		first = first.Next
+	}
+	first.Next = head
+	res := second.Next
+	second.Next = nil
+	return res
+}
+
+func deleteDuplicates(head *ListNode) *ListNode {
+	dummy := &ListNode{0, head}
+	cur := dummy
+	for cur.Next != nil && cur.Next.Next != nil {
+		if cur.Next.Val == cur.Next.Next.Val {
+			temp := cur.Next.Val
+			for cur.Next != nil && cur.Next.Val == temp {
+				cur.Next = cur.Next.Next
+			}
+		} else {
+			cur = cur.Next
+		}
+	}
+	return dummy.Next
+}
+
+// 从head开始找到第一个val大于等于x的节点
+// 将该节点后面val小于x的节点移动至该节点之前
+func partition(head *ListNode, x int) *ListNode {
+	dummy := &ListNode{0, head}
+	second := dummy
+	for second.Next != nil {
+		if second.Next.Val >= x {
+			break
+		}
+		second = second.Next
+	}
+
+	first := second
+	for first.Next != nil {
+		if first.Next.Val < x {
+			temp := first.Next
+			first.Next = first.Next.Next
+			temp.Next = second.Next
+			second.Next = temp
+			second = second.Next
+		} else {
+			first = first.Next
+		}
+	}
+	return dummy.Next
+}

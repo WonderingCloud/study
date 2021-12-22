@@ -668,3 +668,18 @@ func asteroidCollision(asteroids []int) []int {
 	ans = append(ans, left...)
 	return ans
 }
+
+// 038
+func dailyTemperatures(temperatures []int) []int {
+	ans := make([]int, len(temperatures))
+	stack := []int{0}
+	for i := range temperatures {
+		for len(stack) != 0 && temperatures[stack[len(stack)-1]] < temperatures[i] {
+			ans[stack[len(stack)-1]] = i - stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+		}
+
+		stack = append(stack, i)
+	}
+	return ans
+}

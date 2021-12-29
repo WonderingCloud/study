@@ -1,4 +1,4 @@
-package mysort
+package sort
 
 // BubbleSort 冒泡排序
 func BubbleSort(arr []int) {
@@ -120,7 +120,26 @@ func partitionOpt1(arr []int, l, r int) int {
 	return i
 }
 
-
+// 三路快排
 func quickSortOpt(arr []int, l, r int) {
+	if l >= r {
+		return
+	}
 
+	lt, i, gt := l-1, l, r
+	for i < gt {
+		if arr[i] < arr[r] {
+			arr[i], arr[lt+1] = arr[lt+1], arr[i]
+			i++
+			lt++
+		} else if arr[i] > arr[r] {
+			arr[i], arr[gt-1] = arr[gt-1], arr[i]
+			gt--
+		} else {
+			i++
+		}
+	}
+	arr[r], arr[gt] = arr[gt], arr[r]
+	quickSortOpt(arr, l, lt)
+	quickSortOpt(arr, gt+1, r)
 }

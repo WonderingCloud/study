@@ -14,6 +14,14 @@ func min(a, b int) int {
 	return b
 }
 
+func sum(nums []int) int {
+	ans := 0
+	for i := range nums{
+		ans += nums[i]
+	}
+	return ans
+}
+
 type ListNode struct {
 	Val  int
 	Next *ListNode

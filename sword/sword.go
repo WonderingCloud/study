@@ -683,3 +683,59 @@ func dailyTemperatures(temperatures []int) []int {
 	}
 	return ans
 }
+
+// 098
+func uniquePaths(m int, n int) int {
+	dp := make([]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = 1
+	}
+
+	for i := 1; i < m; i++ {
+		for j := 1; j < n; j++ {
+			dp[j] = dp[j] + dp[j-1]
+		}
+	}
+
+	return dp[n-1]
+}
+
+// 099
+func minPathSum(grid [][]int) int {
+	dp := make([]int, len(grid[0]))
+	dp[0] = grid[0][0]
+	for i := 1; i < len(grid[0]); i++ {
+		dp[i] = grid[0][i] + dp[i-1]
+	}
+
+	for i := 1; i < len(grid); i++ {
+		dp[0] = dp[0] + grid[i][0]
+		for j := 1; j < len(grid[0]); j++ {
+			dp[j] = min(dp[j], dp[j-1]) + grid[i][j]
+		}
+	}
+	return dp[len(dp)-1]
+}
+
+// 100
+func minimumTotal(triangle [][]int) int {
+	dp := make([]int, len(triangle))
+	dp[len(dp)-1] = triangle[0][0]
+	for i := 0; i < len(triangle)-1; i++ {
+		dp[i] = 10000
+	}
+
+	for i := 1; i < len(triangle); i++ {
+		for j := i + 1; j > 1; j-- {
+			dp[len(dp)-j] = min(dp[len(dp)-j], dp[len(dp)-j+1]) + triangle[i][i+1-j]
+		}
+		dp[len(dp)-1] = dp[len(dp)-1] + triangle[i][i]
+	}
+
+	ans := dp[len(dp)-1]
+	for i := len(dp) - 2; i >= 0; i-- {
+		ans = min(ans, dp[i])
+	}
+	return ans
+}
+

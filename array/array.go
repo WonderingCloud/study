@@ -58,24 +58,100 @@ func merge(intervals [][]int) [][]int {
 			if intervals[i][1] > interval[1] {
 				interval[1] = intervals[i][1]
 			}
- 		}
+		}
 	}
 	ans = append(ans, interval)
 	return ans
 }
 
-func sortColors(nums []int)  {
-    lt, i, gt := -1, 0, len(nums)
-    for i < gt {
-        if nums[i] == 0 {
-            nums[i], nums[lt+1] = nums[lt+1], nums[i]
-            lt++
-            i++
-        } else if nums[i] == 2 {
-            nums[i], nums[gt-1]= nums[gt-1], nums[i]
-            gt--
-        } else {
-            i++
-        }
-    }
+func sortColors(nums []int) {
+	lt, i, gt := -1, 0, len(nums)
+	for i < gt {
+		if nums[i] == 0 {
+			nums[i], nums[lt+1] = nums[lt+1], nums[i]
+			lt++
+			i++
+		} else if nums[i] == 2 {
+			nums[i], nums[gt-1] = nums[gt-1], nums[i]
+			gt--
+		} else {
+			i++
+		}
+	}
+}
+
+func getRow(rowIndex int) []int {
+	ans := make([]int, rowIndex+1)
+	ans[len(ans)-1] = 1
+	for i := 1; i <= rowIndex; i++ {
+		for j := i + 1; j > 1; j-- {
+			ans[len(ans)-j] = ans[len(ans)-j+1] + ans[len(ans)-j]
+		}
+	}
+	return ans
+}
+
+func rotate(matrix [][]int) {
+	i, j := 0, len(matrix)-1
+	for i < j {
+		matrix[i], matrix[j] = matrix[j], matrix[i]
+		i++
+		j--
+	}
+
+	for i := 0; i < len(matrix); i++ {
+		for j := 0; j < i; j++ {
+			matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+		}
+	}
+}
+
+func generateMatrix(n int) [][]int {
+	ans := make([][]int, n)
+	for i := range ans {
+		ans[i] = make([]int, n)
+	}
+
+	r, b, l, t := n-1, n-1, 0, 0
+	num := 1
+	for num <= n*n {
+		for i := l; i <= r; i++ {
+			ans[t][i] = num
+			num++
+		}
+		t++
+
+		for i := t; i <= b; i++ {
+			ans[i][r] = num
+			num++
+		}
+		r--
+
+		for i := r; i >= l; i-- {
+			ans[b][i] = num
+			num++
+		}
+		b--
+
+		for i := b; i >= t; i-- {
+			ans[i][l] = num
+			num++
+		}
+		l++
+	}
+	return ans
+}
+
+func searchMatrix(matrix [][]int, target int) bool {
+	m, n := 0, len(matrix[0])-1
+	for m < len(matrix) && n >= 0 {
+		if matrix[m][n] == target {
+			return true
+		} else if matrix[m][n] > target {
+			n--
+		} else if matrix[m][n] < target {
+			m++
+		}
+	}
+	return false
 }

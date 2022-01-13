@@ -160,7 +160,6 @@ func simplifyPath(path string) string {
 			}
 			s = ""
 		}
-
 	}
 
 	ans := ""
@@ -170,6 +169,56 @@ func simplifyPath(path string) string {
 
 	if len(ans) == 0 {
 		ans = "/"
+	}
+	return ans
+}
+
+// 2022-01-07
+func maxDepth(s string) int {
+	ans, cnt := 0, 0
+	for i := range s {
+		if s[i] == '(' {
+			cnt++
+			ans = max(ans, cnt)
+		} else if s[i] == ')' {
+			cnt--
+		}
+	}
+	return ans
+}
+
+// 2022-01-08
+func grayCode(n int) []int {
+	ans := make([]int, 0)
+	used := make(map[int]struct{})
+
+	dfs := func(num int) {}
+	dfs = func(num int) {
+		used[num] = struct{}{}
+		ans = append(ans, num)
+		for i := 0; i < n; i++ {
+			next := num ^ 1<<i
+			if _, exist := used[next]; !exist {
+				dfs(next)
+			}
+		}
+	}
+
+	dfs(0)
+	return ans
+}
+
+// 2022-01-09
+func slowestKey(releaseTimes []int, keysPressed string) byte {
+	ans, maxTime, t := keysPressed[0], releaseTimes[0], 0
+	for i := 1; i < len(releaseTimes); i++ {
+		t = releaseTimes[i] - releaseTimes[i-1]
+		if t > maxTime {
+			maxTime = t
+			ans = keysPressed[i]
+		} else if t == maxTime && keysPressed[i] > ans {
+			ans = keysPressed[i]
+		}
 	}
 	return ans
 }

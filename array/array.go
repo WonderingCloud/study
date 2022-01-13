@@ -155,3 +155,34 @@ func searchMatrix(matrix [][]int, target int) bool {
 	}
 	return false
 }
+
+func sortArray(nums []int) []int {
+	if len(nums) == 0 {
+		return nil
+	}
+
+	minVal, maxVal := nums[0], nums[0]
+	for i := range nums {
+		if nums[i] > maxVal {
+			maxVal = nums[i]
+		}
+
+		if nums[i] < minVal {
+			minVal = nums[i]
+		}
+	}
+
+	hash := make([]int, maxVal-minVal+1)
+	for i := range nums {
+		hash[nums[i]-minVal]++
+	}
+
+	curIndex := 0
+	for i := range hash {
+		for hash[i] > 0 {
+			nums[curIndex] = minVal+i
+			curIndex++
+		}
+	}
+	return nums
+}

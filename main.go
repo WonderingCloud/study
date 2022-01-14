@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
 func main() {
-	var a []int
-	a[0]=1
-	fmt.Println(a==nil)
+	
+}
+
+type Test struct {
+	A int
+	B int
 }
 
 func isPalindrome(s string) bool {

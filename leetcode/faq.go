@@ -2,6 +2,8 @@ package leetcode
 
 import (
 	"math"
+	"math/rand"
+	"strconv"
 	"strings"
 )
 
@@ -188,4 +190,290 @@ func wordBreak2(s string, wordDict []string) []string {
 	}
 	dfs(0)
 	return ans
+}
+
+func findWords(board [][]byte, words []string) []string {
+	used := make([][]bool, len(board))
+	for i := range used {
+		used[i] = make([]bool, len(board[0]))
+	}
+
+	var dfs func(i, j, step int, word string) bool
+	dfs = func(i, j, step int, word string) bool {
+		if i < 0 || i >= len(board) || j < 0 || j >= len(board[0]) || used[i][j] {
+			return false
+		}
+
+		if step == len(word)-1 {
+			if board[i][j] == word[step] {
+				return true
+			} else {
+				return false
+			}
+		}
+
+		if board[i][j] != word[step] {
+			return false
+		}
+
+		used[i][j] = true
+		res := dfs(i-1, j, step+1, word) || dfs(i, j+1, step+1, word) || dfs(i+1, j, step+1, word) || dfs(i, j-1, step+1, word)
+		used[i][j] = false
+		return res
+	}
+
+	var check func(word string) bool
+	check = func(word string) bool {
+		for i := range board {
+			for j := range board[0] {
+				if dfs(i, j, 0, word) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	ans := make([]string, 0)
+	for _, v := range words {
+		if check(v) {
+			ans = append(ans, v)
+		}
+	}
+	return ans
+}
+
+func isAnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+
+	dict := [26]int{}
+	for i := range s {
+		dict[s[i]-'a']++
+	}
+
+	for i := range t {
+		dict[t[i]-'a']--
+	}
+
+	for i := range dict {
+		if dict[i] != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func firstUniqChar(s string) int {
+	dict := [26]int{}
+	for i := range dict {
+		dict[i] = -1 // 未出现过
+	}
+	for i := range s {
+		if dict[s[i]-'a'] == -1 {
+			dict[s[i]-'a'] = i
+		} else {
+			dict[s[i]-'a'] = -2 // 出现多次
+		}
+	}
+
+	ans := len(s)
+	for i := range dict {
+		if dict[i] != -1 && dict[i] != -2 {
+			ans = min(ans, dict[i])
+		}
+	}
+
+	if ans == len(s) {
+		ans = -1
+	}
+	return ans
+}
+
+func reverseString(s []byte) {
+	i, j := 0, len(s)-1
+	for i < j {
+		s[i], s[j] = s[j], s[i]
+		i++
+		j--
+	}
+}
+
+func maxProduct(nums []int) int {
+	ans, maxV, minV := nums[0], 1, 1
+	for i := range nums {
+		if nums[i] < 0 {
+			maxV, minV = minV, maxV
+		}
+		maxV = max(nums[i], maxV*nums[i])
+		minV = min(nums[i], minV*nums[i])
+		ans = max(maxV, ans)
+	}
+	return ans
+}
+
+func rotate(nums []int, k int) {
+	k = k % len(nums)
+	if k == 0 {
+		return
+	}
+
+	var reverse func(l, r int)
+	reverse = func(l, r int) {
+		i, j := l, r
+		for i < j {
+			nums[i], nums[j] = nums[j], nums[i]
+			i++
+			j--
+		}
+	}
+
+	reverse(0, len(nums)-1)
+	reverse(0, k-1)
+	reverse(k, len(nums)-1)
+}
+
+func containsDuplicate(nums []int) bool {
+	dict := make(map[int]bool)
+
+	for i := range nums {
+		if dict[nums[i]] {
+			return true
+		}
+		dict[nums[i]] = true
+	}
+	return false
+}
+
+func moveZeroes(nums []int) {
+	j := -1
+	for i := range nums {
+		if nums[i] != 0 {
+			j++
+			nums[j] = nums[i]
+		}
+	}
+
+	for i := j + 1; i < len(nums); i++ {
+		nums[i] = 0
+	}
+}
+
+func intersect(nums1 []int, nums2 []int) []int {
+	dict := make(map[int]int)
+	for i := range nums1 {
+		dict[nums1[i]]++
+	}
+
+	ans := make([]int, 0)
+	for i := range nums2 {
+		if dict[nums2[i]] > 0 {
+			ans = append(ans, nums2[i])
+			dict[nums2[i]]--
+		}
+	}
+	return ans
+}
+
+func findKthLargest(nums []int, k int) int {
+	var partition func(l, r int) int
+	partition = func(l, r int) int {
+		i := rand.Intn(r-l+1) + l
+		nums[i], nums[r] = nums[r], nums[i]
+
+		lt, gt, j := l-1, r, l
+		for j < gt {
+			if nums[j] < nums[r] {
+				nums[j], nums[lt+1] = nums[lt+1], nums[j]
+				j++
+				lt++
+			} else if nums[j] > nums[r] {
+				nums[j], nums[gt-1] = nums[gt-1], nums[j]
+				gt--
+			} else {
+				j++
+			}
+		}
+		nums[gt], nums[r] = nums[r], nums[gt]
+		return gt
+	}
+
+	var quickSelect func(l, r, index int) int
+	quickSelect = func(l, r, index int) int {
+		q := partition(l, r)
+		if q == len(nums)-index {
+			return nums[q]
+		} else if q > len(nums)-index {
+			return quickSelect(l, q-1, index)
+		} else {
+			return quickSelect(q+1, r, index)
+		}
+	}
+
+	return quickSelect(0, len(nums)-1, k)
+}
+
+func evalRPN(tokens []string) int {
+	nums := make([]int, 0)
+
+	for _, v := range tokens {
+		switch v {
+		case "+":
+			nums[len(nums)-2] = nums[len(nums)-2] + nums[len(nums)-1]
+			nums = nums[:len(nums)-1]
+		case "-":
+			nums[len(nums)-2] = nums[len(nums)-2] - nums[len(nums)-1]
+			nums = nums[:len(nums)-1]
+		case "*":
+			nums[len(nums)-2] = nums[len(nums)-2] * nums[len(nums)-1]
+			nums = nums[:len(nums)-1]
+		case "/":
+			nums[len(nums)-2] = nums[len(nums)-2] / nums[len(nums)-1]
+			nums = nums[:len(nums)-1]
+		default:
+			num, _ := strconv.Atoi(v)
+			nums = append(nums, num)
+		}
+	}
+
+	ans := 0
+	for i := range nums {
+		ans += nums[i]
+	}
+	return ans
+}
+
+func copyRandomList(head *Node) *Node {
+	hash := make(map[*Node]*Node)
+
+	cur := head
+	for cur != nil {
+		hash[cur] = &Node{Val: cur.Val}
+		cur = cur.Next
+	}
+
+	cur = head
+	for cur != nil {
+		hash[cur].Next = hash[cur.Next]
+		hash[cur].Random = hash[cur.Random]
+		cur = cur.Next
+	}
+
+	return hash[head]
+}
+
+func hasCycle(head *ListNode) bool {
+	slow, fast := head, head
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+		if slow == fast {
+			return true
+		}
+	}
+	return false
+}
+
+func sortList(head *ListNode) *ListNode {
 }

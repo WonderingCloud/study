@@ -443,16 +443,10 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
 		cur = cur.Next
 	}
 
-	for list1 != nil {
+	if list1 != nil {
 		cur.Next = list1
-		list1 = list1.Next
-		cur = cur.Next
-	}
-
-	for list2 != nil {
+	} else {
 		cur.Next = list2
-		list2 = list2.Next
-		cur = cur.Next
 	}
 	return dummy.Next
 }
@@ -697,11 +691,10 @@ func permute(nums []int) [][]int {
 	return ans
 }*/
 func maxSubArray(nums []int) int {
-	maxSum := func(l, r int) (sum int) { return }
-	maxSum = func(l, r int) (sum int) {
+	var maxSum func(l, r int) int
+	maxSum = func(l, r int) int {
 		if l == r {
-			sum = nums[l]
-			return
+			return nums[l]
 		}
 		mid := l + (r-l)>>1
 		leftSum := maxSum(l, mid)
@@ -718,8 +711,7 @@ func maxSubArray(nums []int) int {
 			val += nums[i]
 			rVal = max(rVal, val)
 		}
-		sum = max(lVal+rVal, max(leftSum, rightSum))
-		return
+		return max(lVal+rVal, max(leftSum, rightSum))
 	}
 	return maxSum(0, len(nums)-1)
 }
@@ -814,4 +806,280 @@ func combinationSum(candidates []int, target int) [][]int {
 // 40. 组合总和 II
 func combinationSum2(candidates []int, target int) [][]int {
 	return nil
+}
+
+func productExceptSelf(nums []int) []int {
+	ans := make([]int, len(nums))
+	for i := range ans {
+		ans[i] = 1
+	}
+
+	left, right := 1, 1
+
+	for i := range nums {
+		ans[i] *= left
+		ans[len(nums)-1-i] *= right
+		left *= nums[i]
+		right *= nums[len(nums)-1-i]
+	}
+	return ans
+}
+
+func spiralOrder(matrix [][]int) []int {
+	m, n := len(matrix), len(matrix[0])
+	length := m * n
+	ans := make([]int, length)
+
+	l, r, t, b, i := 0, n-1, 0, m-1, 0
+	for i < length {
+		for j := l; i < length && j <= r; j++ {
+			ans[i] = matrix[t][j]
+			i++
+		}
+		t++
+
+		for j := t; i < length && j <= b; j++ {
+			ans[i] = matrix[j][r]
+			i++
+		}
+		r--
+
+		for j := r; i < length && j >= l; j-- {
+			ans[i] = matrix[b][j]
+			i++
+		}
+		b--
+
+		for j := b; i < length && j >= t; j-- {
+			ans[i] = matrix[j][l]
+			i++
+		}
+		l++
+	}
+	return ans
+}
+
+func gameOfLife(board [][]int) {
+	// 2: 0->1 3: 1->0
+	direct := []int{-1, 0, 1}
+	m, n := len(board), len(board[0])
+
+	change := func(r, c int) {
+		cnt := 0
+		for _, i := range direct {
+			if r+i < 0 || r+i > m-1 {
+				continue
+			}
+			for _, j := range direct {
+				if c+j < 0 || c+j > n-1 {
+					continue
+				}
+				if i == 0 && j == 0 {
+					continue
+				}
+				if board[r+i][c+j]&1 == 1 {
+					cnt++
+				}
+			}
+		}
+
+		if board[r][c] == 0 {
+			if cnt == 3 {
+				board[r][c] = 2
+			}
+		} else {
+			if cnt == 2 || cnt == 3 {
+				board[r][c] = 1
+			} else {
+				board[r][c] = 3
+			}
+		}
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			change(i, j)
+		}
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if board[i][j] == 2 {
+				board[i][j] = 1
+			} else if board[i][j] == 3 {
+				board[i][j] = 0
+			}
+		}
+	}
+}
+
+func firstMissingPositive(nums []int) int {
+	for i := range nums {
+		for nums[i] >= 1 && nums[i] <= len(nums) && nums[i] != i+1 && nums[nums[i]-1] != nums[i] {
+			nums[i], nums[nums[i]-1] = nums[nums[i]-1], nums[i]
+		}
+	}
+
+	for i := range nums {
+		if nums[i] != i+1 {
+			return i + 1
+		}
+	}
+	return len(nums) + 1
+}
+
+func findDuplicate(nums []int) int {
+	slow, fast := 0, 0
+	for {
+		slow = nums[slow]
+		fast = nums[nums[fast]]
+		if slow == fast {
+			break
+		}
+	}
+
+	slow = 0
+	for slow != fast {
+		slow = nums[slow]
+		fast = nums[fast]
+	}
+	return slow
+}
+
+func calculate(s string) int {
+
+	stack := make([]int, 0)
+
+	num, op := 0, byte('+')
+
+	operator := func(op byte, num int) {
+		switch op {
+		case '+':
+			stack = append(stack, num)
+		case '-':
+			stack = append(stack, -num)
+		case '*':
+			stack[len(stack)-1] *= num
+		case '/':
+			stack[len(stack)-1] /= num
+		}
+	}
+
+	for i := range s {
+		if s[i] >= '0' && s[i] <= '9' {
+			num = num*10 + int(s[i]-'0')
+			if i == len(s)-1 {
+				operator(op, num)
+			}
+		} else {
+			if i > 0 && s[i-1] >= '0' && s[i-1] <= '9' {
+				operator(op, num)
+				num = 0
+			}
+
+			switch s[i] {
+			case '+', '-', '*', '/':
+				op = s[i]
+			default:
+				break
+			}
+		}
+	}
+
+	sum := 0
+	for _, v := range stack {
+		sum += v
+	}
+	return sum
+}
+
+func maxSlidingWindow(nums []int, k int) []int {
+	queue := make([]int, 0)
+
+	ans := make([]int, 0)
+	for i := range nums {
+		if i > 0 && i-queue[0] >= k {
+			queue = queue[1:]
+		}
+
+		for len(queue) != 0 && nums[queue[len(queue)-1]] <= nums[i] {
+			queue = queue[:len(queue)-1]
+		}
+		queue = append(queue, i)
+		if i >= k-1 {
+			ans = append(ans, nums[queue[0]])
+		}
+	}
+	return ans
+}
+
+func mergeKLists(lists []*ListNode) *ListNode {
+	var mergeLists func(l, r int) *ListNode
+	mergeLists = func(l, r int) *ListNode {
+		if l == r {
+			return lists[l]
+		}
+
+		if l > r {
+			return nil
+		}
+
+		mid := l + (r-l)>>1
+		return mergeTwoLists(mergeLists(l, mid), mergeLists(mid+1, r))
+	}
+	return mergeLists(0, len(lists)-1)
+}
+
+func solve(board [][]byte) {
+	m, n := len(board), len(board[0])
+
+	var dfs func(i, j int)
+	dfs = func(i, j int) {
+		if i < 0 || i > m-1 || j < 0 || j > n-1 {
+			return
+		}
+
+		if board[i][j] == 'X' || board[i][j] == '#' {
+			return
+		}
+
+		board[i][j] = '#'
+		dfs(i-1, j)
+		dfs(i, j+1)
+		dfs(i+1, j)
+		dfs(i, j-1)
+	}
+
+	for j := 0; j < n; j++ {
+		dfs(0, j)
+		dfs(m-1, j)
+	}
+
+	for i := 0; i < m; i++ {
+		dfs(i, 0)
+		dfs(i, n-1)
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if board[i][j] == 'O' {
+				board[i][j] = 'X'
+			} else if board[i][j] == '#' {
+				board[i][j] = 'O'
+			}
+		}
+	}
+}
+
+func maxProfit(prices []int) int {
+	if len(prices) == 0 {
+		return 0
+	}
+	minV, ans := prices[0], 0
+
+	for i := 1; i < len(prices); i++ {
+		ans = max(ans, max(0, prices[i]-minV))
+		minV = min(minV, prices[i])
+	}
+	return ans
 }

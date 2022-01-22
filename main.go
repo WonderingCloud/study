@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
+	slidingwindow "mine/sliding_window"
 	"strings"
 )
 
 func main() {
-	
+	fmt.Println(slidingwindow.MaximumUniqueSubarray([]int{4,2,4,5,6}))
 }
 
 type Test struct {

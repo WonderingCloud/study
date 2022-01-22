@@ -222,8 +222,7 @@ func findWords(board [][]byte, words []string) []string {
 		return res
 	}
 
-	var check func(word string) bool
-	check = func(word string) bool {
+	check := func(word string) bool {
 		for i := range board {
 			for j := range board[0] {
 				if dfs(i, j, 0, word) {
@@ -233,6 +232,7 @@ func findWords(board [][]byte, words []string) []string {
 		}
 		return false
 	}
+
 	ans := make([]string, 0)
 	for _, v := range words {
 		if check(v) {
@@ -319,8 +319,7 @@ func rotate(nums []int, k int) {
 		return
 	}
 
-	var reverse func(l, r int)
-	reverse = func(l, r int) {
+	reverse := func(l, r int) {
 		i, j := l, r
 		for i < j {
 			nums[i], nums[j] = nums[j], nums[i]
@@ -377,8 +376,7 @@ func intersect(nums1 []int, nums2 []int) []int {
 }
 
 func findKthLargest(nums []int, k int) int {
-	var partition func(l, r int) int
-	partition = func(l, r int) int {
+	partition := func(l, r int) int {
 		i := rand.Intn(r-l+1) + l
 		nums[i], nums[r] = nums[r], nums[i]
 
@@ -476,4 +474,190 @@ func hasCycle(head *ListNode) bool {
 }
 
 func sortList(head *ListNode) *ListNode {
+
+	mergeList := func(l, r *ListNode) *ListNode {
+		dummy := &ListNode{-1, nil}
+		cur := dummy
+		for l != nil && r != nil {
+			if l.Val <= r.Val {
+				cur.Next = l
+				l = l.Next
+			} else {
+				cur.Next = r
+				r = r.Next
+			}
+			cur = cur.Next
+		}
+
+		if l != nil {
+			cur.Next = l
+		} else {
+			cur.Next = r
+		}
+
+		return dummy.Next
+	}
+
+	var mergeSort func(head *ListNode) *ListNode
+	mergeSort = func(head *ListNode) *ListNode {
+		if head == nil || head.Next == nil {
+			return head
+		}
+
+		slow, fast := head, head.Next
+		for fast != nil && fast.Next != nil {
+			slow = slow.Next
+			fast = fast.Next.Next
+		}
+		r := mergeSort(slow.Next)
+		slow.Next = nil
+		l := mergeSort(head)
+		return mergeList(l, r)
+	}
+
+	return mergeSort(head)
 }
+
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+	curA, curB := headA, headB
+	for curA != curB {
+		if curA == nil {
+			curA = headB
+		} else {
+			curA = curA.Next
+		}
+
+		if curB == nil {
+			curB = headA
+		} else {
+			curB = curB.Next
+		}
+	}
+	return curA
+}
+
+func reverseList(head *ListNode) *ListNode {
+	var cur, prev *ListNode = head, nil
+	for cur != nil {
+		next := cur.Next
+		cur.Next = prev
+		prev = cur
+		cur = next
+	}
+	return prev
+}
+
+func oddEvenList(head *ListNode) *ListNode {
+	if head == nil {
+		return head
+	}
+
+	l, r := head, head.Next
+	for r != nil && r.Next != nil {
+		next := r.Next.Next
+		r.Next.Next = l.Next
+		l.Next = r.Next
+		r.Next = next
+		l = l.Next
+		r = r.Next
+	}
+	return head
+}
+
+func fourSumCount(nums1 []int, nums2 []int, nums3 []int, nums4 []int) int {
+	dict := make(map[int]int)
+	for i := range nums1 {
+		for j := range nums2 {
+			dict[nums1[i]+nums2[j]]++
+		}
+	}
+
+	ans := 0
+	for i := range nums3 {
+		for j := range nums4 {
+			if dict[-nums3[i]-nums4[j]] != 0 {
+				ans += dict[-nums3[i]-nums4[j]]
+			}
+		}
+	}
+	return ans
+}
+
+func kthSmallest(root *TreeNode, k int) int {
+	stack := make([]*TreeNode, 0)
+	cur, cnt := root, 0
+	for cur != nil || len(stack) != 0 {
+		for cur != nil {
+			stack = append(stack, cur)
+			cur = cur.Left
+		}
+
+		cur = stack[len(stack)-1]
+		cnt++
+		if cnt == k {
+			return cur.Val
+		}
+		stack = stack[:len(stack)-1]
+		cur = cur.Right
+	}
+	return 0
+}
+
+func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+	if root == nil || root == p || root == q {
+		return root
+	}
+
+	left := lowestCommonAncestor(root.Left, p, q)
+	right := lowestCommonAncestor(root.Right, p, q)
+	if left != nil && right != nil {
+		return root
+	}
+
+	if left == nil {
+		return right
+	}
+	return left
+}
+
+func ladderLength(beginWord string, endWord string, wordList []string) int {
+
+	canChange := func(a, b string) bool {
+		if len(a) != len(b) {
+			return false
+		}
+		cnt := 0
+		for i := range a {
+			if a[i] != b[i] {
+				cnt++
+			}
+		}
+		return cnt == 1
+	}
+
+	ans := 1
+	used := map[string]bool{beginWord: true}
+	queue := []string{beginWord}
+
+	for len(queue) != 0 {
+		ans++
+		l := len(queue)
+		for i := 0; i < l; i++ {
+			for _, v := range wordList {
+				if used[v] {
+					continue
+				}
+				if canChange(queue[i], v) {
+					if v == endWord {
+						return ans
+					}
+					used[v] = true
+					queue = append(queue, v)
+				}
+			}
+		}
+		queue = queue[l:]
+	}
+	return 0
+}
+

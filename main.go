@@ -2,12 +2,32 @@ package main
 
 import (
 	"fmt"
-	slidingwindow "mine/sliding_window"
+	"mine/backtrack"
 	"strings"
+	"time"
 )
 
 func main() {
-	fmt.Println(slidingwindow.MaximumUniqueSubarray([]int{4,2,4,5,6}))
+
+	board := [][]byte{
+		{'.', '.', '9', '.', '.', '.', '1', '2', '.'},
+		{'.', '.', '.', '.', '7', '.', '.', '.', '9'},
+		{'5', '.', '.', '6', '.', '3', '.', '.', '.'},
+		{'7', '1', '.', '5', '.', '.', '.', '.', '.'},
+		{'9', '.', '.', '.', '.', '.', '.', '.', '2'},
+		{'.', '.', '.', '.', '.', '6', '.', '3', '1'},
+		{'.', '.', '.', '8', '.', '1', '.', '.', '3'},
+		{'8', '.', '.', '.', '5', '.', '.', '.', '.'},
+		{'.', '9', '6', '.', '.', '.', '8', '.', '.'},
+	}
+
+	t1 := time.Now()
+	backtrack.SolveSudoku(board)
+	t2 := time.Now()
+	fmt.Println(t2.Sub(t1))
+	for i := range board {
+		fmt.Println(string(board[i]))
+	}
 }
 
 type Test struct {

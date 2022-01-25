@@ -783,12 +783,12 @@ func combinationSum(candidates []int, target int) [][]int {
 	arr := make([]int, 0)
 	dfs := func(target, idx int) {}
 	dfs = func(target, idx int) {
-		if idx == len(candidates) {
+		if target == 0 {
+			ans = append(ans, append([]int{}, arr...))
 			return
 		}
 
-		if target == 0 {
-			ans = append(ans, append([]int{}, arr...))
+		if idx == len(candidates) {
 			return
 		}
 
@@ -1083,3 +1083,91 @@ func maxProfit(prices []int) int {
 	}
 	return ans
 }
+
+// 142. 环形链表 II
+func detectCycle(head *ListNode) *ListNode {
+	slow, fast := head, head
+
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+		if slow == fast {
+			slow = head
+			for slow != fast {
+				slow = slow.Next
+				fast = fast.Next
+			}
+			return slow
+		}
+	}
+
+	return nil
+}
+
+func exist(board [][]byte, word string) bool {
+	m, n := len(board), len(board[0])
+	used := make([][]bool, m)
+	for i := range used {
+		used[i] = make([]bool, n)
+	}
+
+	var dfs func(i, j, l int) bool
+	dfs = func(i, j, l int) bool {
+		if l == len(word) {
+			return true
+		}
+
+		if i < 0 || i > m-1 || j < 0 || j > n-1 || used[i][j] {
+			return false
+		}
+
+		if board[i][j] != word[l] {
+			return false
+		}
+
+		used[i][j] = true
+		res := dfs(i-1, j, l+1) || dfs(i, j+1, l+1) || dfs(i+1, j, l+1) || dfs(i, j-1, l+1)
+		used[i][j] = false
+		return res
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if dfs(i, j, 0) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// 90. 子集 II
+func subsetsWithDup(nums []int) [][]int {
+	sort.Ints(nums)
+
+	used := make([]bool, len(nums))
+	ans := make([][]int, 0)
+	arr := make([]int, 0)
+	var dfs func(idx int)
+	dfs = func(idx int) {
+		if idx == len(nums) {
+			ans = append(ans, append([]int{}, arr...))
+			return
+		}
+
+		dfs(idx + 1)
+
+		if idx > 0 && nums[idx] == nums[idx-1] && !used[idx-1] {
+			return
+		}
+
+		used[idx] = true
+		arr = append(arr, nums[idx])
+		dfs(idx + 1)
+		used[idx] = false
+		arr = arr[:len(arr)-1]
+	}
+	dfs(0)
+	return ans
+}
+

@@ -285,7 +285,7 @@ func minSubArrayLen(target int, nums []int) int {
 }
 
 // 1695. 删除子数组的最大得分
-func MaximumUniqueSubarray(nums []int) int {
+func maximumUniqueSubarray(nums []int) int {
 	index := make(map[int]int)
 
 	sum, ans, j := 0, 0, -1
@@ -360,4 +360,154 @@ func checkInclusion(s1 string, s2 string) bool {
 		}
 	}
 	return false
+}
+
+// 487. 最大连续1的个数 II
+func findMaxConsecutiveOnes(nums []int) int {
+	start, idx0 := -1, -1
+
+	ans := 0
+	for i := range nums {
+		if nums[i] == 0 {
+			if idx0 >= 0 {
+				start = idx0
+			}
+			idx0 = i
+		}
+		ans = max(ans, i-start)
+	}
+	return ans
+}
+
+// 1004. 最大连续1的个数 III
+func longestOnes(nums []int, k int) int {
+	count := 0
+	ans := 0
+	j := -1
+	for i := range nums {
+		if nums[i] == 0 {
+			count++
+		}
+
+		if count > k {
+			j++
+			if nums[j] == 0 {
+				count--
+			}
+		}
+		ans = max(ans, i-j)
+	}
+	return ans
+}
+
+// 1493. 删掉一个元素以后全为 1 的最长子数组
+func longestSubarray(nums []int) int {
+	start, idx0 := -1, -1
+	ans := 0
+	for i := range nums {
+		if nums[i] == 0 {
+			if idx0 >= 0 {
+				start = idx0
+			}
+			idx0 = i
+		}
+		ans = max(ans, i-start)
+	}
+	return ans - 1
+}
+
+// 995. K 连续位的最小翻转次数
+func minKBitFlips(nums []int, k int) int {
+	return 0
+}
+
+// 727. 最小窗口子序列
+func minWindow2(s1 string, s2 string) string {
+	i, j := 0, 0
+	start, minL, k := 0, len(s1)+1, -1
+
+	for i < len(s1) {
+		if s1[i] == s2[j] {
+			j++
+		}
+		for j == len(s2) {
+			if i-k < minL {
+				minL = i - k
+				start = k + 1
+			}
+			k++
+			if s1[k] == s2[0] {
+				j = 0
+				i = k
+			}
+		}
+		i++
+	}
+	if minL == len(s1)+1 {
+		return ""
+	}
+	return s1[start : start+minL]
+}
+
+// 159. 至多包含两个不同字符的最长子串
+func lengthOfLongestSubstringTwoDistinct(s string) int {
+	dict := map[byte]int{}
+
+	j, ans := -1, 0
+	for i := range s {
+		dict[s[i]]++
+
+		for len(dict) > 2 {
+			j++
+			if dict[s[j]] == 1 {
+				delete(dict, s[j])
+			} else {
+				dict[s[j]]--
+			}
+		}
+		ans = max(ans, i-j)
+	}
+	return ans
+}
+
+// 340. 至多包含 K 个不同字符的最长子串
+func lengthOfLongestSubstringKDistinct(s string, k int) int {
+	dict := map[byte]int{}
+
+	j, ans := -1, 0
+	for i := range s {
+		dict[s[i]]++
+
+		for len(dict) > k {
+			j++
+			if dict[s[j]] == 1 {
+				delete(dict, s[j])
+			} else {
+				dict[s[j]]--
+			}
+		}
+		ans = max(ans, i-j)
+	}
+	return ans
+}
+
+// 239. 滑动窗口最大值
+func maxSlidingWindow(nums []int, k int) []int {
+	queue := make([]int, 0)
+	ans := make([]int, 0)
+	for i := range nums {
+		if i > 0 && i - queue[0] == k {
+			queue = queue[1:]
+		}
+
+		for len(queue) > 0 && nums[queue[len(queue)-1]] <= nums[i] {
+			queue = queue[:len(queue)-1]
+		}
+		queue = append(queue, i)
+
+		if i >= k-1 {
+			ans = append(ans, nums[queue[0]])
+		}
+	}
+	return ans
 }

@@ -200,16 +200,12 @@ func findWords(board [][]byte, words []string) []string {
 
 	var dfs func(i, j, step int, word string) bool
 	dfs = func(i, j, step int, word string) bool {
-		if i < 0 || i >= len(board) || j < 0 || j >= len(board[0]) || used[i][j] {
-			return false
+		if step == len(word) {
+			return true
 		}
 
-		if step == len(word)-1 {
-			if board[i][j] == word[step] {
-				return true
-			} else {
-				return false
-			}
+		if i < 0 || i >= len(board) || j < 0 || j >= len(board[0]) || used[i][j] {
+			return false
 		}
 
 		if board[i][j] != word[step] {
